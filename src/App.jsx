@@ -75,12 +75,12 @@ function useBookSize() {
   return size
 }
 
-const FLIP_MS = 700
+const FLIP_MS = 880
 
 export default function App() {
   const { w, h, mobile } = useBookSize()
   const [index, setIndex] = useState(0)
-  const [flipId, setFlipId] = useState(null)
+  const [flip, setFlip] = useState(null) // { id, dir } while a leaf is turning
   const lock = useRef(false)
   const touch = useRef(null)
 
@@ -112,9 +112,9 @@ export default function App() {
     const ni = index + dir
     if (ni < 0 || ni > LAST) return
     lock.current = true
-    setFlipId(dir > 0 ? index : ni) // the leaf that physically turns
+    setFlip({ id: dir > 0 ? index : ni, dir }) // the leaf that physically turns
     setIndex(ni)
-    window.setTimeout(() => { lock.current = false; setFlipId(null) }, FLIP_MS)
+    window.setTimeout(() => { lock.current = false; setFlip(null) }, FLIP_MS)
   }
 
   useEffect(() => {
@@ -148,28 +148,29 @@ export default function App() {
       <div className="stage-glow" />
 
       <div
-        className="flip"
-        style={{ width: w, height: h }}
+        className={`flip${flip ? (flip.dir > 0 ? ' flipping-next' : ' flipping-prev') : ''}`}
+        style={{ width: w, height: h, '--ft': `${FLIP_MS}ms` }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
         {leaves.map((leaf, i) => {
           const turned = i < index
-          const z = i === flipId ? total + 5 : turned ? i : total - i
+          const isFlip = flip && flip.id === i
+          const z = isFlip ? 9999 : turned ? i : total - i
           return (
             <div
               key={leaf.key}
               className={`leaf page ${leaf.cls}${turned ? ' is-turned' : ''}`}
               style={{ zIndex: z }}
+              data-flip={isFlip ? (flip.dir > 0 ? 'next' : 'prev') : undefined}
               aria-hidden={i !== index}
             >
-              <div className="leaf-face">
-                <div className="page-inner">{leaf.node}</div>
-                <span className="leaf-shadow" />
-              </div>
+              <div className="page-inner">{leaf.node}</div>
+              <span className="leaf-shade" />
             </div>
           )
         })}
+        <span className="fold-shadow" />
       </div>
 
       <div className="controls">

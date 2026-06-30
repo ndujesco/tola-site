@@ -31,18 +31,45 @@ html, body { height: 100%; overflow: hidden; }
 .leaf {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   transform-origin: left center;
-  transition: transform 0.7s cubic-bezier(0.34, 0.86, 0.3, 1);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   will-change: transform;
 }
-.leaf.is-turned { transform: rotateY(-179.9deg); }
-.leaf-face { position: absolute; inset: 0; overflow: hidden; }
-.leaf-shadow {
-  position: absolute; inset: 0; pointer-events: none; z-index: 5;
-  background: linear-gradient(90deg, rgba(0,0,0,0.18), rgba(0,0,0,0) 16%);
-  opacity: 0;
+.leaf.is-turned { transform: rotateY(-180deg); }
+
+/* shading that pools into the crease as the leaf folds away */
+.leaf-shade {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0;
+  background:
+    linear-gradient(to left, rgba(10,3,6,0) 34%, rgba(8,2,5,0.55) 100%),
+    linear-gradient(to right, rgba(255,245,225,0.10), rgba(255,245,225,0) 12%);
+}
+
+/* soft shadow the lifting page casts across the page being revealed */
+.fold-shadow {
+  position: absolute; inset: 0; z-index: 9990; pointer-events: none; opacity: 0;
+  background: linear-gradient(to right, rgba(6,2,4,0.6), rgba(6,2,4,0) 34%);
+}
+
+/* one-shot fold — a real page turn around the spine */
+.leaf[data-flip="next"] { animation: foldNext var(--ft, 880ms) cubic-bezier(0.62, 0.04, 0.3, 1) forwards; }
+.leaf[data-flip="prev"] { animation: foldPrev var(--ft, 880ms) cubic-bezier(0.62, 0.04, 0.3, 1) forwards; }
+.leaf[data-flip="next"] .leaf-shade { animation: shadeNext var(--ft, 880ms) cubic-bezier(0.62, 0.04, 0.3, 1) forwards; }
+.leaf[data-flip="prev"] .leaf-shade { animation: shadePrev var(--ft, 880ms) cubic-bezier(0.62, 0.04, 0.3, 1) forwards; }
+.flip.flipping-next .fold-shadow,
+.flip.flipping-prev .fold-shadow { animation: castShadow var(--ft, 880ms) ease-in-out forwards; }
+
+@keyframes foldNext { from { transform: rotateY(0deg); } to { transform: rotateY(-180deg); } }
+@keyframes foldPrev { from { transform: rotateY(-180deg); } to { transform: rotateY(0deg); } }
+@keyframes shadeNext { 0% { opacity: 0; } 58% { opacity: 0.95; } 100% { opacity: 0.95; } }
+@keyframes shadePrev { 0% { opacity: 0.95; } 42% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes castShadow { 0% { opacity: 0; } 50% { opacity: 0.6; } 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf[data-flip] { animation-duration: 1ms; }
+  .leaf-shade, .fold-shadow { display: none; }
 }
 
 /* ===================== PAGE SHELL ===================== */
