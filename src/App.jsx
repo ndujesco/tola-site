@@ -75,7 +75,7 @@ function useBookSize() {
   return size
 }
 
-const FLIP_MS = 880
+const FLIP_MS = 980
 
 export default function App() {
   const { w, h, mobile } = useBookSize()
@@ -160,13 +160,19 @@ export default function App() {
           return (
             <div
               key={leaf.key}
-              className={`leaf page ${leaf.cls}${turned ? ' is-turned' : ''}`}
+              className={`leaf${turned ? ' is-turned' : ''}`}
               style={{ zIndex: z }}
               data-flip={isFlip ? (flip.dir > 0 ? 'next' : 'prev') : undefined}
               aria-hidden={i !== index}
             >
-              <div className="page-inner">{leaf.node}</div>
-              <span className="leaf-shade" />
+              <div className={`leaf-front page ${leaf.cls}`}>
+                <div className="page-inner">{leaf.node}</div>
+                <span className="leaf-shade" />
+              </div>
+              <div className="leaf-back">
+                <span className="back-art">Universal Tola&rsquo;s Day</span>
+                <span className="leaf-shade leaf-shade-back" />
+              </div>
             </div>
           )
         })}

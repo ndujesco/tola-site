@@ -23,28 +23,54 @@ html, body { height: 100%; overflow: hidden; }
 .flip {
   position: relative;
   flex: 0 0 auto;
-  perspective: 2200px;
+  perspective: 1150px;
+  perspective-origin: 50% 50%;
   box-shadow: 0 30px 80px rgba(0,0,0,0.55);
 }
 .stage.is-mobile .flip { box-shadow: none; }
 
+/* a leaf is a two-sided sheet that turns around its left spine */
 .leaf {
   position: absolute;
   inset: 0;
-  overflow: hidden;
   transform-origin: left center;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   will-change: transform;
 }
 .leaf.is-turned { transform: rotateY(-180deg); }
 
-/* shading that pools into the crease as the leaf folds away */
+.leaf-front,
+.leaf-back {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+/* the reverse of the sheet — paper you actually see fold over */
+.leaf-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, #efe3cd 0%, #e4d4b6 52%, #d6c39f 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 0 90px rgba(120,85,40,0.18);
+}
+.back-art {
+  font-family: var(--serif); font-style: italic; font-weight: 700;
+  font-size: clamp(20px, 5vw, 34px); line-height: 1.05;
+  color: rgba(74,14,31,0.15);
+  text-align: center; padding: 0 14%;
+  transform: scaleX(-1);
+}
+
+/* shading that pools into the crease as the leaf folds */
 .leaf-shade {
   position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0;
-  background:
-    linear-gradient(to left, rgba(10,3,6,0) 34%, rgba(8,2,5,0.55) 100%),
-    linear-gradient(to right, rgba(255,245,225,0.10), rgba(255,245,225,0) 12%);
+  background: linear-gradient(to left, rgba(10,3,6,0) 30%, rgba(6,2,4,0.62) 100%);
+}
+.leaf-shade-back {
+  opacity: 1;
+  background: linear-gradient(to right, rgba(10,3,6,0) 28%, rgba(6,2,4,0.5) 100%);
 }
 
 /* soft shadow the lifting page casts across the page being revealed */
@@ -53,19 +79,29 @@ html, body { height: 100%; overflow: hidden; }
   background: linear-gradient(to right, rgba(6,2,4,0.6), rgba(6,2,4,0) 34%);
 }
 
-/* one-shot fold — a real page turn around the spine */
-.leaf[data-flip="next"] { animation: foldNext var(--ft, 880ms) cubic-bezier(0.62, 0.04, 0.3, 1) forwards; }
-.leaf[data-flip="prev"] { animation: foldPrev var(--ft, 880ms) cubic-bezier(0.62, 0.04, 0.3, 1) forwards; }
-.leaf[data-flip="next"] .leaf-shade { animation: shadeNext var(--ft, 880ms) cubic-bezier(0.62, 0.04, 0.3, 1) forwards; }
-.leaf[data-flip="prev"] .leaf-shade { animation: shadePrev var(--ft, 880ms) cubic-bezier(0.62, 0.04, 0.3, 1) forwards; }
+/* one-shot fold — a real page turn around the spine.
+   The keyframes spend ~72% of the time on the *visible* 0–90° fold, then
+   the sheet finishes turning away off-screen, so the fold reads clearly. */
+.leaf[data-flip="next"] { animation: foldNext var(--ft, 980ms) cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards; }
+.leaf[data-flip="prev"] { animation: foldPrev var(--ft, 980ms) cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards; }
+.leaf[data-flip="next"] .leaf-front .leaf-shade { animation: shadeNext var(--ft, 980ms) linear forwards; }
+.leaf[data-flip="prev"] .leaf-front .leaf-shade { animation: shadePrev var(--ft, 980ms) linear forwards; }
 .flip.flipping-next .fold-shadow,
-.flip.flipping-prev .fold-shadow { animation: castShadow var(--ft, 880ms) ease-in-out forwards; }
+.flip.flipping-prev .fold-shadow { animation: castShadow var(--ft, 980ms) ease-in-out forwards; }
 
-@keyframes foldNext { from { transform: rotateY(0deg); } to { transform: rotateY(-180deg); } }
-@keyframes foldPrev { from { transform: rotateY(-180deg); } to { transform: rotateY(0deg); } }
-@keyframes shadeNext { 0% { opacity: 0; } 58% { opacity: 0.95; } 100% { opacity: 0.95; } }
-@keyframes shadePrev { 0% { opacity: 0.95; } 42% { opacity: 0; } 100% { opacity: 0; } }
-@keyframes castShadow { 0% { opacity: 0; } 50% { opacity: 0.6; } 100% { opacity: 0; } }
+@keyframes foldNext {
+  0% { transform: rotateY(0deg); }
+  72% { transform: rotateY(-90deg); }
+  100% { transform: rotateY(-180deg); }
+}
+@keyframes foldPrev {
+  0% { transform: rotateY(-180deg); }
+  28% { transform: rotateY(-90deg); }
+  100% { transform: rotateY(0deg); }
+}
+@keyframes shadeNext { 0% { opacity: 0; } 72% { opacity: 0.95; } 100% { opacity: 0.6; } }
+@keyframes shadePrev { 0% { opacity: 0.6; } 28% { opacity: 0.95; } 100% { opacity: 0; } }
+@keyframes castShadow { 0% { opacity: 0; } 60% { opacity: 0.6; } 100% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   .leaf[data-flip] { animation-duration: 1ms; }
