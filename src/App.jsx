@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import HTMLFlipBook from 'react-pageflip'
-import Page from './components/Page.jsx'
+import { useEffect, useRef, useState } from 'react'
 import CoverContent from './components/CoverContent.jsx'
 import Puzzle from './components/Puzzle.jsx'
 import PhotoPage from './components/PhotoPage.jsx'
@@ -45,138 +43,141 @@ const spreads = [
   },
 ]
 
+const BAR = 64
+
+function calcSize() {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const mobile = vw < 760
+  if (mobile) return { w: vw, h: Math.max(vh - BAR, 360), mobile: true }
+  let h = Math.min(vh * 0.92, 920)
+  let w = Math.round(h * 0.66)
+  const maxW = vw * 0.6
+  if (w > maxW) { w = Math.round(maxW); h = Math.round(w / 0.66) }
+  return { w, h, mobile: false }
+}
+
 function useBookSize() {
-  const calc = () => {
-    const vw = window.innerWidth
-    const vh = window.innerHeight
-    const ratio = 0.66 // page width / height (portrait)
-    let h = Math.min(vh * 0.9, 940)
-    let w = h * ratio
-    const maxW = Math.min(vw * 0.96, 620)
-    if (w > maxW) {
-      w = maxW
-      h = w / ratio
-    }
-    return { w: Math.round(w), h: Math.round(h) }
-  }
-  const [size, setSize] = useState(calc)
+  const [size, setSize] = useState(calcSize)
   useEffect(() => {
-    let t
-    const onResize = () => {
-      clearTimeout(t)
-      t = setTimeout(() => setSize(calc()), 150)
+    let lastW = window.innerWidth
+    const maybe = () => {
+      if (window.innerWidth !== lastW) { lastW = window.innerWidth; setSize(calcSize()) }
     }
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
+    const onOrient = () => setSize(calcSize())
+    window.addEventListener('resize', maybe)
+    window.addEventListener('orientationchange', onOrient)
+    return () => {
+      window.removeEventListener('resize', maybe)
+      window.removeEventListener('orientationchange', onOrient)
+    }
   }, [])
   return size
 }
 
+const FLIP_MS = 700
+
 export default function App() {
-  const bookRef = useRef(null)
-  const [active, setActive] = useState(0)
-  const [opened, setOpened] = useState(false)
-  const { w, h } = useBookSize()
+  const { w, h, mobile } = useBookSize()
+  const [index, setIndex] = useState(0)
+  const [flipId, setFlipId] = useState(null)
+  const lock = useRef(false)
+  const touch = useRef(null)
 
-  // page indices: 0 cover · 1 puzzle · 2-5 spreads · 6 letter1 · 7 letter2 · 8 heart · 9 back
   const HEART_INDEX = 8
-  const LAST_INDEX = 9
 
-  const flip = (dir) => {
-    const pf = bookRef.current?.pageFlip()
-    if (!pf) return
-    // 'bottom' corner is the reliable one (the 'top' corner won't open a hard cover)
-    dir > 0 ? pf.flipNext('bottom') : pf.flipPrev('bottom')
+  const leaves = [
+    { key: 'cover', cls: 'page-cover', node: <CoverContent /> },
+    { key: 'puzzle', cls: 'page-paper', node: <Puzzle /> },
+    ...spreads.map((s) => ({ key: s.issue, cls: 'page-photo', node: <PhotoPage {...s} /> })),
+    { key: 'letter1', cls: 'page-letter', node: <Letter part={1} /> },
+    { key: 'letter2', cls: 'page-letter', node: <Letter part={2} /> },
+    { key: 'heart', cls: 'page-heart', node: <HeartGraph active={index === HEART_INDEX} /> },
+    {
+      key: 'back', cls: 'page-back', node: (
+        <div className="back-content">
+          <p className="kicker">End of Issue</p>
+          <p className="back-line">Universal Tola&rsquo;s Day</p>
+          <p className="back-sub">A one-of-one print run of love</p>
+          <p className="back-credit">Words, pictures &amp; whole heart — xoxo&nbsp;Tobi</p>
+        </div>
+      ),
+    },
+  ]
+  const total = leaves.length
+  const LAST = total - 1
+
+  const go = (dir) => {
+    if (lock.current) return
+    const ni = index + dir
+    if (ni < 0 || ni > LAST) return
+    lock.current = true
+    setFlipId(dir > 0 ? index : ni) // the leaf that physically turns
+    setIndex(ni)
+    window.setTimeout(() => { lock.current = false; setFlipId(null) }, FLIP_MS)
   }
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'ArrowRight') flip(1)
-      else if (e.key === 'ArrowLeft') flip(-1)
+      if (e.key === 'ArrowRight') go(1)
+      else if (e.key === 'ArrowLeft') go(-1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  })
 
-  const totalLabel = useMemo(() => `${Math.min(active + 1, LAST_INDEX + 1)} / ${LAST_INDEX + 1}`, [active])
+  const onTouchStart = (e) => {
+    const t = e.touches[0]
+    touch.current = { x: t.clientX, y: t.clientY, t: Date.now() }
+  }
+  const onTouchEnd = (e) => {
+    if (!touch.current) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - touch.current.x
+    const dy = t.clientY - touch.current.y
+    const dt = Date.now() - touch.current.t
+    touch.current = null
+    // horizontal, decisive, not a vertical scroll
+    if (Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      go(dx < 0 ? 1 : -1)
+    }
+  }
 
   return (
-    <div className="stage">
+    <div className={`stage${mobile ? ' is-mobile' : ''}`}>
       <div className="stage-glow" />
 
-      <HTMLFlipBook
-        ref={bookRef}
-        className="magazine"
-        width={w}
-        height={h}
-        size="fixed"
-        minWidth={260}
-        maxWidth={640}
-        minHeight={400}
-        maxHeight={960}
-        drawShadow
-        maxShadowOpacity={0.5}
-        showCover
-        usePortrait
-        flippingTime={760}
-        useMouseEvents
-        clickEventForward={false}
-        disableFlipByClick
-        mobileScrollSupport
-        startPage={0}
-        onFlip={(e) => {
-          setActive(e.data)
-          if (e.data > 0) setOpened(true)
-        }}
+      <div
+        className="flip"
+        style={{ width: w, height: h }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
-        <Page className="page-cover" density="hard">
-          <CoverContent />
-        </Page>
-
-        <Page className="page-paper">
-          <Puzzle />
-        </Page>
-
-        {spreads.map((s) => (
-          <Page className="page-photo" key={s.issue}>
-            <PhotoPage {...s} />
-          </Page>
-        ))}
-
-        <Page className="page-letter">
-          <Letter part={1} />
-        </Page>
-        <Page className="page-letter">
-          <Letter part={2} />
-        </Page>
-
-        <Page className="page-heart" density="hard">
-          <HeartGraph active={active === HEART_INDEX} />
-        </Page>
-
-        <Page className="page-back" density="hard">
-          <div className="back-content">
-            <p className="kicker">End of Issue</p>
-            <p className="back-line">Universal Tola&rsquo;s Day</p>
-            <p className="back-sub">A one-of-one print run of love</p>
-            <p className="back-credit">Words, pictures &amp; whole heart — xoxo&nbsp;Tobi</p>
-          </div>
-        </Page>
-      </HTMLFlipBook>
-
-      {!opened && (
-        <div className="open-hint" onClick={() => flip(1)}>
-          <span>drag the corner to open</span>
-          <i className="corner-curl" />
-        </div>
-      )}
+        {leaves.map((leaf, i) => {
+          const turned = i < index
+          const z = i === flipId ? total + 5 : turned ? i : total - i
+          return (
+            <div
+              key={leaf.key}
+              className={`leaf page ${leaf.cls}${turned ? ' is-turned' : ''}`}
+              style={{ zIndex: z }}
+              aria-hidden={i !== index}
+            >
+              <div className="leaf-face">
+                <div className="page-inner">{leaf.node}</div>
+                <span className="leaf-shadow" />
+              </div>
+            </div>
+          )
+        })}
+      </div>
 
       <div className="controls">
-        <button className="nav-btn" onClick={() => flip(-1)} aria-label="Previous page" disabled={active === 0}>
+        <button className="nav-btn" onClick={() => go(-1)} aria-label="Previous page" disabled={index === 0}>
           ‹
         </button>
-        <span className="page-count">{totalLabel}</span>
-        <button className="nav-btn" onClick={() => flip(1)} aria-label="Next page" disabled={active >= LAST_INDEX}>
+        <span className="page-count">{index + 1} / {total}</span>
+        <button className="nav-btn nav-next" onClick={() => go(1)} aria-label="Next page" disabled={index === LAST}>
           ›
         </button>
       </div>
