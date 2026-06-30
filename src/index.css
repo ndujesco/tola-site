@@ -1,0 +1,86 @@
+:root {
+  /* Palette — glossy magazine: wine, cream, gold */
+  --wine: #4a0e1f;
+  --wine-deep: #2c0712;
+  --ink: #1a0e12;
+  --cream: #f5ecdc;
+  --cream-soft: #efe3cf;
+  --paper: #f1e7d4;
+  --rose: #d98a9a;
+  --blush: #e9c2c8;
+  --gold: #c9a24b;
+  --gold-bright: #e6c878;
+  --red: #c01933;
+
+  --serif: 'Playfair Display', Georgia, serif;
+  --body: 'Cormorant Garamond', Georgia, serif;
+  --type: 'Special Elite', 'Courier New', monospace;
+  --condensed: 'Bebas Neue', Impact, sans-serif;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--body);
+  font-size: 20px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img { display: block; max-width: 100%; }
+
+/* Paper grain overlay used on light sections */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* shared eyebrow / kicker */
+.kicker {
+  font-family: var(--type);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: clamp(10px, 1.4vw, 13px);
+  opacity: 0.8;
+}
+
+.rule {
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  width: 100%;
+}
+.rule.double {
+  height: 5px;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+}
+
+/* selection */
+::selection { background: var(--gold); color: var(--wine-deep); }
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
