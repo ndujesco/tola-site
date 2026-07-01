@@ -135,7 +135,7 @@ export default function HeartGraph({ active = false }) {
           animate={active ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
           transition={{ duration: 1, delay: 2.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          I love you: solved, proven, and forever.
+          I love you.
         </motion.p>
       </div>
     </div>
