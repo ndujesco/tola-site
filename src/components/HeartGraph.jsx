@@ -66,7 +66,7 @@ export default function HeartGraph({ active = false }) {
 
   return (
     <div className="heart-content">
-      <p className="heart-eyebrow kicker">A Mathematical Way to Say I Love You</p>
+      {/* <p className="heart-eyebrow kicker">A Mathematical Way to Say I Love You</p> */}
 
       <div className="heart-eq">
         (x<sup>2</sup> + y<sup>2</sup> &minus; 1)<sup>3</sup> &minus; x<sup>2</sup>y<sup>3</sup> = 0

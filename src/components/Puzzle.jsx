@@ -130,10 +130,7 @@ export default function Puzzle() {
         <div className="puzzle-head">
           <p className="puzzle-eyebrow">No. 02 · The Daily Crossword</p>
           <h2 className="puzzle-title">Solve Her Story</h2>
-          <p className="puzzle-dek">
-            One of those puzzles you lose an hour to. Fill every square: the answers spell out exactly
-            who you are. Crack it, and the date reveals itself.
-          </p>
+
         </div>
 
         <div className="puzzle-body">

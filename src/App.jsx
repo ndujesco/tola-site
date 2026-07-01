@@ -9,7 +9,7 @@ import './App.css'
 const spreads = [
   {
     issue: 'No. 03', title: 'Sexy Since 01', sub: 'The Throwback Edition', theme: 'baby', layout: 'trio',
-    blurb: 'Filed under: born iconic. The receipts are in: she has been the moment since day one.',
+    blurb: 'Born Iconic, she has been the moment since day one.',
     photos: [
       { src: '/photos/baby-1.jpeg', cap: 'Exhibit A: the original it-girl' },
       { src: '/photos/baby-2.jpeg', cap: 'Already serving looks at the table' },
@@ -32,7 +32,7 @@ const spreads = [
   },
   {
     issue: 'No. 06', title: 'Hottest Girl, Industrial Maths', sub: 'Brains & Beauty', theme: 'maths', layout: 'mosaic',
-    blurb: 'My big-brained baby, my genius, the Maths goddess. The proof is left as an exercise for the reader.',
+    blurb: 'My big-brained baby, my genius, my Maths Goddess. The proof is left as an exercise for the reader.',
     photos: [
       { src: '/photos/corporate.jpeg', cap: 'Boardroom-ready, runway-worthy' },
       { src: '/photos/tv-1.jpeg', cap: 'On every screen' },
