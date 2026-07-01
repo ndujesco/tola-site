@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 
 /* The exact curve from her equation:  (x^2 + y^2 - 1)^3 - x^2 * y^3 = 0
    For each angle we solve for the outermost radius on that ray, so the
-   plotted heart is the real implicit curve — not a stand-in. */
+   plotted heart is the real implicit curve, not a stand-in. */
 function heartPoints(samples = 260) {
   const f = (r, c2, s3) => Math.pow(r * r - 1, 3) - Math.pow(r, 5) * c2 * s3
   const pts = []
@@ -135,7 +135,7 @@ export default function HeartGraph({ active = false }) {
           animate={active ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
           transition={{ duration: 1, delay: 2.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          I love you — solved, proven, and forever.
+          I love you: solved, proven, and forever.
         </motion.p>
       </div>
     </div>

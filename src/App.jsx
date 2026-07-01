@@ -9,16 +9,16 @@ import './App.css'
 const spreads = [
   {
     issue: 'No. 03', title: 'Sexy Since 01', sub: 'The Throwback Edition', theme: 'baby', layout: 'trio',
-    blurb: 'Filed under: born iconic. The receipts are in — she has been the moment since day one.',
+    blurb: 'Filed under: born iconic. The receipts are in: she has been the moment since day one.',
     photos: [
-      { src: '/photos/baby-1.jpeg', cap: 'Exhibit A — the original it-girl' },
+      { src: '/photos/baby-1.jpeg', cap: 'Exhibit A: the original it-girl' },
       { src: '/photos/baby-2.jpeg', cap: 'Already serving looks at the table' },
       { src: '/photos/baby-3.jpeg', cap: 'Certified since birth' },
     ],
   },
   {
     issue: 'No. 04', title: "She's Fabulous", sub: 'A Study in Style', theme: 'fabulous', layout: 'trio',
-    blurb: 'Stylish, hard-working, a whole muse. Photographed in full bloom — flowers recognise flowers.',
+    blurb: 'Stylish, hard-working, a whole muse. Photographed in full bloom: flowers recognise flowers.',
     photos: [
       { src: '/photos/floral-1.jpeg', cap: 'Among the flowers, the rarest one' },
       { src: '/photos/floral-2.jpeg', cap: 'Effortless, as always' },
@@ -99,7 +99,7 @@ export default function App() {
           <p className="kicker">End of Issue</p>
           <p className="back-line">Universal Tola&rsquo;s Day</p>
           <p className="back-sub">A one-of-one print run of love</p>
-          <p className="back-credit">Words, pictures &amp; whole heart — xoxo&nbsp;Tobi</p>
+          <p className="back-credit">Words, pictures &amp; whole heart, xoxo&nbsp;Tobi</p>
         </div>
       ),
     },

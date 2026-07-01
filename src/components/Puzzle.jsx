@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 /* Hand-verified crossword. Grid 7 rows x 9 cols.
    1A MATHS · 5A FABULOUS · 2D TOLA · 3D JULY · 4D QUEEN
-   Solving it spells her world — and reveals the birthday: 1 · 07 */
+   Solving it spells her world, and reveals the birthday: 1 · 07 */
 const SOLUTION = {
   '0-0': 'M', '0-1': 'A', '0-2': 'T', '0-3': 'H', '0-4': 'S',
   '1-2': 'O',
@@ -20,7 +20,7 @@ const COLS = 9
 const WORDS = {
   across: [
     { n: 1, clue: "She's the hottest girl in Industrial ___", cells: ['0-0', '0-1', '0-2', '0-3', '0-4'] },
-    { n: 5, clue: 'Iconic, amazing — simply ___', cells: ['3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7', '3-8'] },
+    { n: 5, clue: 'Iconic, amazing: simply ___', cells: ['3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7', '3-8'] },
   ],
   down: [
     { n: 2, clue: "Today's cover star 👑", cells: ['0-2', '1-2', '2-2', '3-2'] },
@@ -131,7 +131,7 @@ export default function Puzzle() {
           <p className="puzzle-eyebrow">No. 02 · The Daily Crossword</p>
           <h2 className="puzzle-title">Solve Her Story</h2>
           <p className="puzzle-dek">
-            One of those puzzles you lose an hour to. Fill every square — the answers spell out exactly
+            One of those puzzles you lose an hour to. Fill every square: the answers spell out exactly
             who you are. Crack it, and the date reveals itself.
           </p>
         </div>

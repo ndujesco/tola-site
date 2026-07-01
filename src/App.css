@@ -48,7 +48,7 @@ html, body { height: 100%; overflow: hidden; }
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
-/* the reverse of the sheet — paper you actually see fold over */
+/* the reverse of the sheet: paper you actually see fold over */
 .leaf-back {
   transform: rotateY(180deg);
   background: linear-gradient(135deg, #efe3cd 0%, #e4d4b6 52%, #d6c39f 100%);
@@ -79,7 +79,7 @@ html, body { height: 100%; overflow: hidden; }
   background: linear-gradient(to right, rgba(6,2,4,0.6), rgba(6,2,4,0) 34%);
 }
 
-/* one-shot fold — a real page turn around the spine.
+/* one-shot fold: a real page turn around the spine.
    The keyframes spend ~72% of the time on the *visible* 0–90° fold, then
    the sheet finishes turning away off-screen, so the fold reads clearly. */
 .leaf[data-flip="next"] { animation: foldNext var(--ft, 980ms) cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards; }
